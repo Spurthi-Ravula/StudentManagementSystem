@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head::head}">
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/index}">Student Management System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/login}">Login</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="row col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Registration</h2>
+            </div>
+            <div th:if="${param.success}">
+                <div class="alert alert-info">
+                    You have successfully registered our app!
+                </div>
+            </div>
+			<div class="alert alert-danger" th:if="${#fields.hasErrors('user.email')}" th:errors="*{user.email}"></div>
+            <div class="card-body">
+                <form
+                        method="post"
+                        role="form"
+                        th:action="@{/register/save}"
+                        th:object="${user}"
+                        onsubmit="validateSignupForm()"
+                >
+                    <div class="form-group mb-3">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input
+                                class="form-control"
+                                id="firstName"
+                                name="firstName"
+                                placeholder="Enter first name"
+                                th:field="*{firstName}"
+                                type="text"
+								onkeydown="return /[a-z]/i.test(event.key)"
+                        />
+                        <p th:errors = "*{firstName}" class="text-danger"
+                           th:if="${#fields.hasErrors('firstName')}"></p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input
+                                class="form-control"
+                                id="lastName"
+                                name="lastName"
+                                placeholder="Enter last name"
+                                th:field="*{lastName}"
+                                type="text"
+								onkeydown="return /[a-z]/i.test(event.key)"
+                        />
+                        <p th:errors = "*{lastName}" class="text-danger"
+                           th:if="${#fields.hasErrors('lastName')}"></p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input
+                                class="form-control"
+                                id="email"
+                                name="email"
+                                placeholder="Enter email address"
+                                th:field="*{email}"
+                                type="email"
+                        />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input
+                                class="form-control"
+                                id="password"
+                                name="password"
+                                placeholder="Enter password"
+                                th:field="*{password}"
+                                type="password"
+                        />
+                        <p th:errors = "*{password}" class="text-danger"
+                           th:if="${#fields.hasErrors('password')}"></p>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Register</button>
+                        <span>Already registered? <a th:href="@{/login}">Login here</a></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragments/footer.html :: footer"></div>
+<script>
+    function validateSignupForm() {
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        if (firstName.trim() === '' || lastName.trim() === '' || email.trim() === '' || password.trim() === '') {
+            alert('Input fields cannot be empty');
+            event.preventDefault();
+            return false;
+        }
+
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        let validatePassword = regex.test(password);
+        if (!validatePassword) {
+			event.preventDefault();
+            alert('Password must contain at least one uppercase character, one lowercase character, one symbol, one digit and must contain 8 characters')
+            return false;
+        }
+
+        const isValidEmail = (email) => {
+      		const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    		return emailRegex.test(email);
+		};
+
+		if (!isValidEmail(email)) {
+    		event.preventDefault();
+    		alert('Invalid email address. Please enter a valid email.');
+    		return false;
+		}
+
+        const containsDigits = (str) => /\d/.test(str); // Function to check if string contains digits
+        // Check if first name or last name contain any digits
+		if (containsDigits(firstName) || containsDigits(lastName)) {
+    		event.preventDefault();
+    		alert('Invalid first or last name. Please ensure they do not contain any digits.');
+    		return false;
+		}
+
+		return true;
+    }
+
+</script>
+</body>
+</html>

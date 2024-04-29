@@ -1,0 +1,62 @@
+create table if not exists users
+(
+    id       bigint auto_increment
+        primary key,
+    email    varchar(255) not null,
+    name     varchar(255) not null,
+    password varchar(255) not null,
+    constraint UK_6dotkott2kjsp8vw4d0m25fb7
+        unique (email)
+);
+
+create table if not exists chat_room
+(
+    id           bigint auto_increment
+        primary key,
+    recipient_id bigint       null,
+    sender_id    bigint       null,
+    chat_id      varchar(255) null,
+    constraint FK6ept16aectchy48yx59vj59yb
+        foreign key (sender_id) references users (id),
+    constraint FKo248bdv5tg8aaqg6wlpvvxiwe
+        foreign key (recipient_id) references users (id)
+);
+
+create table if not exists chat_message
+(
+    id           bigint auto_increment
+        primary key,
+    recipient_id bigint       null,
+    sender_id    bigint       null,
+    timestamp    datetime(6)  null,
+    chat_id      varchar(255) null,
+    content      varchar(255) null,
+    constraint FK5f82aoyy0jiwpj08qapfrxbh6
+        foreign key (sender_id) references users (id),
+    constraint FKcgyxvhgugj6jd86tuyvnm6sxd
+        foreign key (recipient_id) references users (id)
+);
+
+create table if not exists accommodation
+(
+    id          bigint auto_increment
+        primary key,
+    user_id     bigint                              null,
+    posted_date timestamp default CURRENT_TIMESTAMP null,
+    price       double                              null,
+    title       varchar(255)                        null,
+    address     varchar(255)                        null,
+    longitude   double                              null,
+    latitude    double                              null,
+    description varchar(255)                        null,
+    image       longblob                            null,
+    status      varchar(255)                        null,
+    constraint accommodation_ibfk_1
+        foreign key (user_id) references users (id),
+    constraint fk_user_id_key
+        foreign key (user_id) references users (id)
+);
+
+INSERT INTO student_management_system.users (id, email, name, password) VALUES (1, 'asjid866@gmail.com', 'Asjid Yasin', '$2a$10$XGDVlsj48srXDbi0/34I..lPAV1xifiHXXTFp/5EJrXc2Whkw9vFC');
+INSERT INTO student_management_system.users (id, email, name, password) VALUES (2, 'admin@gmail.com', 'admin admin', '$2a$10$YyxXRI5U47UmbkMEoZpFbOVzbAJQ4lpDlyE9Bpr8VeuKyFfDpZI7S');
+INSERT INTO student_management_system.users (id, email, name, password) VALUES (3, 'asjid@gmail.com', 'Asjid Yasin', '$2a$10$cotdy/2dZ9NdqCWYBLmwjOOQqGJIVz0itcYURdg9/ciG7Qeet5ckm');

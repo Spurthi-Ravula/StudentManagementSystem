@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/head::head}"></head>
+  <body>
+    <div th:replace="fragments/header.html :: header"></div>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-5 d-flex justify-content-between">
+            <input type="text" id="searchbar" name="search" placeholder="Search by title ..." />
+            <a th:href="@{/my-accommodation}">
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAccommodationModal">My Accommodations</button>
+            </a>
+          </div>
+
+          <h1 class="mb-4 text-center">Available Accommodations</h1>
+          <div class="row">
+            <div th:each="accommodation : ${accommodations}" class="col-md-4 mb-4 card-accommodation">
+              <img
+                th:src="@{'data:image/jpeg;base64,'+${accommodation.generateBase64Image()}}"
+                alt="Accommodation Image"
+                class="card-accommodation-img-top"
+              />
+              <div class="card-body">
+                <h5 class="card-title" th:text="${accommodation.title}"></h5>
+                <p class="card-address" th:text="'Address: ' +${accommodation.address}"></p>
+                <p class="card-availability" th:text="'Available From: ' +${accommodation.availableFrom}"></p>
+                <p class="card-description" th:text="'Description: ' +${accommodation.description}"></p>
+                <p class="card-price" th:text="'Price: $' + ${accommodation.price}"></p>
+                <div class="mb-3 d-flex justify-content-end">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-toggle="modal"
+                    onclick="confirmReservation(this)"
+                    th:value="${accommodation.id}"
+                    data-target="#addAccommodationModal"
+                  >
+                    Reserve Accommodations
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input th:value="${success}" disabled hidden="hidden" id="success" />
+      <input th:value="${message}" disabled hidden="hidden" id="message" />
+    </div>
+    <div th:replace="~{fragments/footer::footer}"></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var success = document.getElementById('success').value;
+
+        if (success != 'null') {
+          var message = document.getElementById('message').value;
+
+          if (success === 'true') {
+            swal({
+              title: 'Success!',
+              text: message,
+              icon: 'success',
+              button: 'close!',
+            });
+          } else if (success === 'false') {
+            swal({
+              title: 'Failure!',
+              text: message,
+              icon: 'failure',
+              button: 'close!',
+            });
+          }
+        }
+
+        $('#searchbar').keyup(function () {
+          let accommodations = $('.card-accommodation');
+          let keyword = $(this).val().toLowerCase();
+          if (keyword == '') accommodations.show();
+          else {
+            accommodations.each(function (index, element) {
+              let title = $(element).find('.card-title').text().toLowerCase();
+              title.indexOf(keyword) >= 0 ? $(element).show() : $(element).hide();
+            });
+          }
+        });
+      });
+
+      function confirmReservation(button) {
+        const id = button.value;
+        console.log(id);
+        swal({
+          title: 'Are you sure?',
+          text: 'Do you want to reserve the accommodation?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Reserve',
+          cancelButtonText: 'No, cancel',
+        }).then((result) => {
+          if (result.value === true) {
+            console.log(result);
+            console.log(result.isConfirmed);
+            window.location.href = '/reserve-accommodation?id=' + id;
+          } else {
+            console.log(result);
+            console.log(result.isConfirmed);
+            // If the user cancels, prevent the default action
+            event.preventDefault();
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
